@@ -16,8 +16,9 @@ WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
 WHATSAPP_VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN")
 
 # WispHub CRM
-WISPHUB_API_URL = os.getenv("WISPHUB_API_URL", "https://api.wisphub.net")
+WISPHUB_API_URL = os.getenv("WISPHUB_API_URL", "https://api.wisphub.app/api")
 WISPHUB_API_TOKEN = os.getenv("WISPHUB_API_TOKEN")
+WISPHUB_COMPANY_ID = os.getenv("WISPHUB_COMPANY_ID")
 
 # --- Directories ---
 PENDING_DIR = BASE_DIR / "pending_receipts"
