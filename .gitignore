@@ -1,0 +1,28 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Database
+payments.db
+
+# Receipt images
+pending_receipts/*
+processed_receipts/*
+error_receipts/*
+!pending_receipts/.gitkeep
+!processed_receipts/.gitkeep
+!error_receipts/.gitkeep
+
+# Logs
+logs/*.log
+!logs/.gitkeep
+
+# IDE
+.vscode/
+.idea/
