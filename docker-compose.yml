@@ -1,0 +1,21 @@
+services:
+  payment-processor:
+    build: .
+    container_name: fiberperu-pagos
+    restart: always
+    ports:
+      - "8085:8085"
+    env_file:
+      - .env
+    volumes:
+      - ./payments.db:/app/payments.db
+      - ./logs:/app/logs
+      - ./pending_receipts:/app/pending_receipts
+      - ./processed_receipts:/app/processed_receipts
+      - ./error_receipts:/app/error_receipts
+    networks:
+      - fiber-peru_fiberperu-network
+
+networks:
+  fiber-peru_fiberperu-network:
+    external: true

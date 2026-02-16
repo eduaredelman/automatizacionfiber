@@ -1,0 +1,11 @@
+.env
+.git
+__pycache__
+venv
+*.pyc
+payments.db
+logs/*
+pending_receipts/*
+processed_receipts/*
+error_receipts/*
+KOMMO_API_RESEARCH.md
