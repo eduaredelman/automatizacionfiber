@@ -136,6 +136,8 @@ def send_message(phone: str, text: str) -> bool:
 
     try:
         resp = requests.post(url, json=payload, headers=headers, timeout=30)
+        if resp.status_code >= 400:
+            logger.error(f"WhatsApp API error {resp.status_code}: {resp.text}")
         resp.raise_for_status()
         logger.info(f"Message sent to {phone}")
         return True

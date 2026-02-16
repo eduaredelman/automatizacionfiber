@@ -34,60 +34,67 @@ BANK_PATTERNS = {
 # Data extraction patterns
 # ---------------------------------------------------------------------------
 
-# Amount: S/ 50.00, S/50, 50.00, PEN 50.00, $ 50.00
 AMOUNT_PATTERNS = [
     r"S/\.?\s*(\d{1,6}[.,]\d{2})",
-    r"S/\.?\s*(\d{1,6})",
+    r"S/\.?\s*(\d{1,6})\b",
     r"PEN\s*(\d{1,6}[.,]\d{2})",
     r"(\d{1,6}[.,]\d{2})\s*(?:soles|PEN)",
-    r"(?:monto|importe|total|pagaste|recibido|enviaste)\s*:?\s*S?/?\.?\s*(\d{1,6}[.,]\d{2})",
+    r"(?:monto|importe|total|pagaste|recibido|enviaste|pago)\s*:?\s*S?/?\.?\s*(\d{1,6}[.,]\d{2})",
+    r"(?:monto|importe|total|pagaste|recibido|enviaste|pago)\s*:?\s*S?/?\.?\s*(\d{1,6})\b",
     r"USD?\s*\$?\s*(\d{1,6}[.,]\d{2})",
+    # Standalone large decimal near payment keywords
+    r"(?:^|\n)\s*(\d{2,6}[.,]\d{2})\s*(?:$|\n)",
+    # Yape-specific: amount often appears as standalone number
+    r"[Ss]/?\s*(\d{2,6}[.,]\d{2})",
 ]
 
-# Operation code / transaction ID
 OPERATION_PATTERNS = [
-    r"(?:N[°ºo]?\s*(?:de\s*)?(?:operaci[oó]n|transacci[oó]n|referencia|pedido))\s*:?\s*(\w{4,20})",
+    r"(?:N[°ºo.]?\s*(?:de\s*)?(?:operaci[oó]n|transacci[oó]n|referencia|pedido))\s*:?\s*(\w{4,20})",
+    r"(?:Nro\.?\s*(?:de\s*)?operaci[oó]n)\s*:?\s*(\w{4,20})",
     r"(?:C[oó]digo|Code)\s*:?\s*(\w{4,20})",
     r"(?:operaci[oó]n|transacci[oó]n)\s*:?\s*#?\s*(\w{4,20})",
-    r"(?:N[°ºo]?\s*operaci[oó]n)\s*:?\s*(\d{6,20})",
     r"(?:CodOpe|Op\.?)\s*:?\s*(\d{6,20})",
     r"#(\d{8,20})",
 ]
 
-# Date: DD/MM/YYYY, DD-MM-YYYY, DD de mes YYYY
-DATE_PATTERNS = [
-    r"(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})",
-    r"(\d{1,2})\s*de\s*(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s*(?:de\s*)?(\d{2,4})",
-]
+# Date patterns - full and abbreviated month names
+DATE_PATTERNS_NUMERIC = r"(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})"
+
+DATE_PATTERNS_TEXT = r"(\d{1,2})\s*(?:de\s*)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)\s*(?:de\s*)?\.?\s*(\d{2,4})"
 
 MONTH_MAP = {
     "enero": "01", "febrero": "02", "marzo": "03", "abril": "04",
     "mayo": "05", "junio": "06", "julio": "07", "agosto": "08",
     "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12",
+    "ene": "01", "feb": "02", "mar": "03", "abr": "04",
+    "may": "05", "jun": "06", "jul": "07", "ago": "08",
+    "sep": "09", "oct": "10", "nov": "11", "dic": "12",
+    "ene.": "01", "feb.": "02", "mar.": "03", "abr.": "04",
+    "may.": "05", "jun.": "06", "jul.": "07", "ago.": "08",
+    "sep.": "09", "oct.": "10", "nov.": "11", "dic.": "12",
 }
 
-# Time: HH:MM:SS or HH:MM
 TIME_PATTERNS = [
     r"(\d{1,2}:\d{2}:\d{2})",
-    r"(\d{1,2}:\d{2})\s*(?:hrs?|a\.?m\.?|p\.?m\.?|horas)?",
+    r"(\d{1,2}:\d{2})\s*(?:p\.?\s*m\.?|a\.?\s*m\.?)",
+    r"(\d{1,2}:\d{2})\s*(?:hrs?|horas)?",
 ]
 
-# Phone number (Peru: 9 digits starting with 9)
 PHONE_PATTERNS = [
     r"(?:celular|tel[eé]fono|m[oó]vil|cel)\s*:?\s*(\d{9})",
     r"\b(9\d{8})\b",
 ]
 
-# Last 4 digits of card/account
 LAST4_PATTERNS = [
     r"\*{2,}(\d{4})",
     r"(?:terminada?\s*en|ending)\s*(\d{4})",
     r"(?:cuenta|tarjeta)\s*\*+(\d{4})",
 ]
 
-# Name patterns
 NAME_PATTERNS = [
-    r"(?:De|Para|Enviado\s*a|Recibido\s*de|Pagador|Destinatario|Nombre)\s*:?\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){1,4})",
+    r"(?:De|Para|Enviado\s*a|Recibido\s*de|Pagador|Nombre)\s*:?\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){1,4})",
+    r"(?:Destino|Destinatario)\s*:?\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,4})",
+    r"(?:Destino|Destinatario)\s+([A-Z][A-Za-záéíóúñ\s]{2,30})",
 ]
 
 
@@ -95,17 +102,14 @@ def preprocess_image(image_path: str) -> Image.Image:
     """Enhance image for better OCR results."""
     img = Image.open(image_path)
 
-    # Convert to RGB if needed
     if img.mode != "RGB":
         img = img.convert("RGB")
 
-    # Resize if too small
     w, h = img.size
     if w < 800:
         ratio = 800 / w
         img = img.resize((int(w * ratio), int(h * ratio)), Image.LANCZOS)
 
-    # Enhance contrast and sharpness
     img = ImageEnhance.Contrast(img).enhance(1.5)
     img = ImageEnhance.Sharpness(img).enhance(2.0)
     img = img.filter(ImageFilter.SHARPEN)
@@ -114,16 +118,28 @@ def preprocess_image(image_path: str) -> Image.Image:
 
 
 def extract_text(image_path: str) -> str:
-    """Extract text from image using Tesseract OCR."""
+    """Extract text from image using Tesseract OCR.
+
+    Tries multiple PSM modes for best results.
+    """
     img = preprocess_image(image_path)
 
-    # Try Spanish first, then Spanish+English
+    # PSM 6: Assume a single uniform block of text
     text = pytesseract.image_to_string(img, lang="spa", config="--psm 6")
 
-    if len(text.strip()) < 20:
-        text = pytesseract.image_to_string(img, lang="spa+eng", config="--psm 3")
+    # If too little text, try PSM 3 (fully automatic)
+    if len(text.strip()) < 30:
+        text2 = pytesseract.image_to_string(img, lang="spa", config="--psm 3")
+        if len(text2.strip()) > len(text.strip()):
+            text = text2
+
+    # Also try PSM 4 (single column) and merge unique lines
+    text3 = pytesseract.image_to_string(img, lang="spa", config="--psm 4")
+    if len(text3.strip()) > len(text.strip()):
+        text = text3
 
     logger.info(f"OCR extracted {len(text)} chars from {Path(image_path).name}")
+    logger.debug(f"OCR text: {text[:300]}")
     return text
 
 
@@ -138,15 +154,17 @@ def detect_bank(text: str) -> str | None:
 
 
 def extract_amount(text: str) -> tuple[float | None, str]:
-    """Extract amount and currency. Returns (amount, currency)."""
-    # Check for USD first
+    """Extract amount and currency."""
     for pattern in AMOUNT_PATTERNS:
         match = re.search(pattern, text)
         if match:
             amount_str = match.group(1).replace(",", ".")
             try:
                 amount = float(amount_str)
-                currency = "USD" if "USD" in text or "US$" in text or "dólar" in text.lower() else "PEN"
+                if amount < 0.5 or amount > 100000:
+                    continue
+                is_usd = bool(re.search(r"(?i)(USD|US\$|d[oó]lar)", text))
+                currency = "USD" if is_usd else "PEN"
                 return amount, currency
             except ValueError:
                 continue
@@ -156,7 +174,7 @@ def extract_amount(text: str) -> tuple[float | None, str]:
 def extract_operation_code(text: str) -> str | None:
     """Extract operation/transaction code."""
     for pattern in OPERATION_PATTERNS:
-        match = re.search(pattern, text)
+        match = re.search(pattern, text, re.IGNORECASE)
         if match:
             return match.group(1)
     return None
@@ -164,8 +182,19 @@ def extract_operation_code(text: str) -> str | None:
 
 def extract_date(text: str) -> str | None:
     """Extract date in YYYY-MM-DD format."""
-    # Try numeric dates first
-    match = re.search(DATE_PATTERNS[0], text)
+    # Try text dates first (more reliable)
+    match = re.search(DATE_PATTERNS_TEXT, text, re.IGNORECASE)
+    if match:
+        day = match.group(1)
+        month_str = match.group(2).lower().rstrip(".")
+        month = MONTH_MAP.get(month_str, MONTH_MAP.get(month_str + ".", "01"))
+        year = match.group(3)
+        if len(year) == 2:
+            year = "20" + year
+        return f"{year}-{month}-{int(day):02d}"
+
+    # Try numeric dates
+    match = re.search(DATE_PATTERNS_NUMERIC, text)
     if match:
         day, month, year = match.group(1), match.group(2), match.group(3)
         if len(year) == 2:
@@ -174,25 +203,23 @@ def extract_date(text: str) -> str | None:
             day, month = month, day
         return f"{year}-{int(month):02d}-{int(day):02d}"
 
-    # Try text dates
-    match = re.search(DATE_PATTERNS[1], text, re.IGNORECASE)
-    if match:
-        day = match.group(1)
-        month = MONTH_MAP.get(match.group(2).lower(), "01")
-        year = match.group(3)
-        if len(year) == 2:
-            year = "20" + year
-        return f"{year}-{month}-{int(day):02d}"
-
     return None
 
 
 def extract_time(text: str) -> str | None:
     """Extract time in HH:MM:SS format."""
     for pattern in TIME_PATTERNS:
-        match = re.search(pattern, text)
+        match = re.search(pattern, text, re.IGNORECASE)
         if match:
             time_str = match.group(1)
+            # Check for PM
+            pm_match = re.search(r"p\.?\s*m\.?", text[match.start():match.end()+10], re.IGNORECASE)
+            if pm_match:
+                parts = time_str.split(":")
+                hour = int(parts[0])
+                if hour < 12:
+                    hour += 12
+                time_str = f"{hour}:{parts[1]}"
             if len(time_str) == 5:
                 time_str += ":00"
             return time_str
@@ -218,11 +245,14 @@ def extract_last4(text: str) -> str | None:
 
 
 def extract_names(text: str) -> tuple[str | None, str | None]:
-    """Extract payer and receiver names. Returns (payer, receiver)."""
+    """Extract payer and receiver names."""
     names = []
     for pattern in NAME_PATTERNS:
         matches = re.findall(pattern, text)
-        names.extend(matches)
+        for m in matches:
+            name = m.strip()
+            if len(name) > 2:
+                names.append(name)
 
     payer = names[0] if len(names) > 0 else None
     receiver = names[1] if len(names) > 1 else None
@@ -230,10 +260,7 @@ def extract_names(text: str) -> tuple[str | None, str | None]:
 
 
 def parse_receipt_ocr(image_path: str) -> dict:
-    """Full OCR pipeline: extract text, then parse all fields.
-
-    Returns dict with extracted data and confidence indicator.
-    """
+    """Full OCR pipeline: extract text, then parse all fields."""
     text = extract_text(image_path)
 
     if len(text.strip()) < 10:
@@ -261,8 +288,14 @@ def parse_receipt_ocr(image_path: str) -> dict:
 
     if has_bank and has_amount and has_operation:
         confidence = "high"
+    elif has_bank and has_operation:
+        confidence = "medium"
     elif has_bank and has_amount:
         confidence = "medium"
+    elif has_amount and has_operation:
+        confidence = "medium"
+    elif has_bank:
+        confidence = "low"
     elif has_amount:
         confidence = "low"
     else:
@@ -271,7 +304,6 @@ def parse_receipt_ocr(image_path: str) -> dict:
     is_valid = confidence in ("high", "medium")
     is_legible = len(text.strip()) > 30
 
-    # Determine medio_pago
     medio_pago = None
     if bank in ("Yape", "Plin"):
         medio_pago = bank
@@ -301,6 +333,6 @@ def parse_receipt_ocr(image_path: str) -> dict:
 
     logger.info(
         f"OCR result: bank={bank}, amount={amount}, "
-        f"operation={operation}, confidence={confidence}"
+        f"operation={operation}, date={date}, confidence={confidence}"
     )
     return result
